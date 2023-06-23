@@ -19,7 +19,7 @@ int main() {
 	DWORD Find_Process_Handle;
 	int test = 0;
 
-	Find_Process_PID = GET_PROCESS_NAME(L"ac_client.exe");
+	Find_Process_PID = GET_PROCESS_NAME(L"Notepad.exe");
 	Find_Process_Handle = OpenProcess(PROCESS_VM_READ, FALSE, Find_Process_PID);
 	test = RVA_Calc();
 
@@ -90,7 +90,7 @@ int RVA_Calc() {
 	IMAGE_DOS_HEADER dosHeader;
 	FILE* Choice_File = NULL;
 
-	fopen_s(&Choice_File, "C:\\Program Files (x86)\\AssaultCube 1.3.0.2\\bin_win32\\ac_client.exe", "rb");
+	fopen_s(&Choice_File, "C:\\Windows\\System32\\Notepad.exe", "rb");
 	if (Choice_File == NULL) {
 		printf("파일 열기 실패\n");
 		return 1;
