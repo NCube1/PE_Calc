@@ -5,6 +5,7 @@
 * 3. OpenProcess를 통해 프로세스의 핸들 값을 얻어온다. * 4. ReadProcessMemory 함수를 통해 프로그램의 메모리 주소값을 얻는다
 * 5. ReadProcessMemory를 통한 메모리 주소값과 RVA값을 통해 메모리 변조를 시도한다.
 */
+#define _CRT_SECURE_NO_WARNINGS 
 #include <stdio.h>
 #include <Windows.h>
 #include <tlhelp32.h>
@@ -19,7 +20,7 @@ int main() {
 	int test = 0;
 
 	Find_Process_PID = GET_PROCESS_NAME(L"ac_client.exe");
-	Find_Process_Handle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, Find_Process_PID);
+	Find_Process_Handle = OpenProcess(PROCESS_VM_READ, FALSE, Find_Process_PID);
 	test = RVA_Calc();
 
 	// OpenProcess에 값이 없다면 실행
@@ -60,7 +61,8 @@ DWORD GET_PROCESS_NAME(LPWSTR name) {
 
 	// snapshot 반환 성공
 	if (snapshot != INVALID_HANDLE_VALUE) {
-		// PROCESSENTRY32 사이즈를 초기화를 하지 않으면 오류가 나온다. Process_name.dwSize = sizeof(Process_name);
+		// PROCESSENTRY32 사이즈를 초기화를 하지 않으면 오류가 나온다. 
+		Process_name.dwSize = sizeof(Process_name);
 		if (Process32FirstW(snapshot, &Process_name)) {
 			do {
 				if (!wcscmp(Process_name.szExeFile, name)) {
@@ -78,6 +80,7 @@ DWORD GET_PROCESS_NAME(LPWSTR name) {
 			return -1;
 		}
 		CloseHandle(snapshot);
+		return Process_name.th32ProcessID;
 	}
 	// snapshot 반환 실패
 	else
