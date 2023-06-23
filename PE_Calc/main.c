@@ -1,27 +1,30 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <tlhelp32.h>
+#include <stdint.h>
 
 // L : long | P : pointer | W : 유니코드가 정의되었다면 LPWSTR이고 아니라면 LPSTR로 된다 | STR : string | C : constant
 DWORD GET_PROCESS_NAME(LPWSTR name);
-int RVA_Calc();
+uint32_t RVA_Calc();
 
 int main() {
 	DWORD Find_Process_PID;
 	DWORD Find_Process_Handle;
-	int test = 0;
+	uint32_t ReadMemory = NULL;
+	ULONGLONG BaseAddress = 0;
 
 	Find_Process_PID = GET_PROCESS_NAME(L"Notepad.exe");
 	Find_Process_Handle = OpenProcess(PROCESS_VM_READ, FALSE, Find_Process_PID);
-
+	BaseAddress = RVA_Calc();
 	// OpenProcess에 값이 없다면 실행
 	if (Find_Process_Handle == NULL) {
 		printf("Handle값이 없습니다.\n");
 		return -1;
 	}
-	test = RVA_Calc();
 
-	printf("e_magic: 0x%x\n", test);
+	printf("BaseAddress = %u\n", BaseAddress);
+	//ReadMemory = ReadProcessMemory(Find_Process_Handle, BaseAddress, );
+	
 	printf("Find_Process_PID : %d\n", Find_Process_PID);
 	printf("Find_Process_Handle : %d\n", Find_Process_Handle);
 
@@ -79,9 +82,11 @@ DWORD GET_PROCESS_NAME(LPWSTR name) {
 		printf("NO snapshot\n");
 }
 
-int RVA_Calc() {
+uint32_t RVA_Calc() {
 	IMAGE_DOS_HEADER dosHeader;
+	IMAGE_OPTIONAL_HEADER optionHeader;
 	FILE* Choice_File = NULL;
+	LONG exeHeader = 0;
 
 	fopen_s(&Choice_File, "C:\\Windows\\System32\\Notepad.exe", "rb");
 	if (Choice_File == NULL) {
@@ -90,7 +95,11 @@ int RVA_Calc() {
 	}
 
 	fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, Choice_File);
+	exeHeader = dosHeader.e_lfanew;
+
+	fseek(&dosHeader, exeHeader, 0);
+	fread(&optionHeader, sizeof(IMAGE_OPTIONAL_HEADER), 1, Choice_File);
 	fclose(Choice_File);
 
-	return dosHeader.e_magic;
+	return optionHeader.ImageBase;
 }
