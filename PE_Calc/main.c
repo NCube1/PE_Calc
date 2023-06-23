@@ -9,11 +9,11 @@ uint32_t RVA_Calc();
 
 int main() {
 	DWORD Find_Process_PID;
-	DWORD Find_Process_Handle;
-	uint32_t ReadMemory = NULL;
+	HANDLE Find_Process_Handle;
+	uint32_t ReadMemory = 0;
 	ULONGLONG BaseAddress = 0;
 
-	Find_Process_PID = GET_PROCESS_NAME(L"Notepad.exe");
+	Find_Process_PID = GET_PROCESS_NAME(L"ori_notepad.exe");
 	Find_Process_Handle = OpenProcess(PROCESS_VM_READ, FALSE, Find_Process_PID);
 	BaseAddress = RVA_Calc();
 	// OpenProcess에 값이 없다면 실행
@@ -22,7 +22,7 @@ int main() {
 		return -1;
 	}
 
-	printf("BaseAddress = %u\n", BaseAddress);
+	printf("BaseAddress = %llu\n", BaseAddress);
 	//ReadMemory = ReadProcessMemory(Find_Process_Handle, BaseAddress, );
 	
 	printf("Find_Process_PID : %d\n", Find_Process_PID);
@@ -88,7 +88,7 @@ uint32_t RVA_Calc() {
 	FILE* Choice_File = NULL;
 	LONG exeHeader = 0;
 
-	fopen_s(&Choice_File, "C:\\Windows\\System32\\Notepad.exe", "rb");
+	fopen_s(&Choice_File, "C:\\Users\\NCube\\Desktop\\ori_notepad.exe", "rb");
 	if (Choice_File == NULL) {
 		printf("파일 열기 실패\n");
 		return 1;
@@ -97,8 +97,8 @@ uint32_t RVA_Calc() {
 	fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, Choice_File);
 	exeHeader = dosHeader.e_lfanew;
 
-	fseek(&dosHeader, exeHeader, 0);
-	fread(&optionHeader, sizeof(IMAGE_OPTIONAL_HEADER), 1, Choice_File);
+	fseek(&Choice_File, exeHeader, SEEK_SET);
+ 	fread(&dosHeader, sizeof(IMAGE_OPTIONAL_HEADER), 1, Choice_File);
 	fclose(Choice_File);
 
 	return optionHeader.ImageBase;
