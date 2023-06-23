@@ -13,13 +13,13 @@ int main() {
 
 	Find_Process_PID = GET_PROCESS_NAME(L"Notepad.exe");
 	Find_Process_Handle = OpenProcess(PROCESS_VM_READ, FALSE, Find_Process_PID);
-	test = RVA_Calc();
 
 	// OpenProcess에 값이 없다면 실행
 	if (Find_Process_Handle == NULL) {
 		printf("Handle값이 없습니다.\n");
 		return -1;
 	}
+	test = RVA_Calc();
 
 	printf("e_magic: 0x%x\n", test);
 	printf("Find_Process_PID : %d\n", Find_Process_PID);
