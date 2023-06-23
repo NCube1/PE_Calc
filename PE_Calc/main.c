@@ -78,6 +78,7 @@ DWORD GET_PROCESS_NAME(LPWSTR name) {
 	else
 		printf("NO snapshot\n");
 }
+
 int RVA_Calc() {
 	IMAGE_DOS_HEADER dosHeader;
 	FILE* Choice_File = NULL;
