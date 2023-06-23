@@ -1,11 +1,3 @@
-/*
-* 프로그램의 순서
-* 1. 해당 프로그램의 PE헤더를 탐색하여 RVA값을 구하기
-* 2. GET_PROCESS_NAME을 통해 실행중인 ac_client.exe의 PID 값을 구하기
-* 3. OpenProcess를 통해 프로세스의 핸들 값을 얻어온다. * 4. ReadProcessMemory 함수를 통해 프로그램의 메모리 주소값을 얻는다
-* 5. ReadProcessMemory를 통한 메모리 주소값과 RVA값을 통해 메모리 변조를 시도한다.
-*/
-#define _CRT_SECURE_NO_WARNINGS 
 #include <stdio.h>
 #include <Windows.h>
 #include <tlhelp32.h>
